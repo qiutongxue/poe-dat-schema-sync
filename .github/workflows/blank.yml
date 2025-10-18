@@ -1,34 +1,45 @@
-name: Update Schema JSON
+name: Update Schema Weekly
 
 on:
   schedule:
-    - cron: "0 3 * * 1"  # 每周一早上 11:00（UTC+8）
-  workflow_dispatch:       # 手动触发按钮
+    - cron: "0 3 * * 1" # 每周一 UTC+3
+  workflow_dispatch: # 手动触发
 
 jobs:
   update:
-    name: Sync schema.min.json
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
-      - name: Checkout current repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download latest schema.min.json
+      - name: Download schema file
         run: |
-          curl -fsSL -o schema.min.json \
-            "https://github.com/poe-tool-dev/dat-schema/releases/download/latest/schema.min.json"
+          echo "Downloading latest schema..."
+          curl -L -o schema.min.json https://github.com/poe-tool-dev/dat-schema/releases/download/latest/schema.min.json
+          ls -lh schema.min.json
+          head -c 100 schema.min.json || true
 
-      - name: Commit & Push if changed
+      - name: Commit and push if changed or new
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "actions@github.com"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet schema.min.json; then
-            echo "✅ No changes in schema.min.json"
-            exit 0
+          if [ ! -f schema.min.json ]; then
+            echo "❌ schema.min.json not found!"
+            exit 1
           fi
 
+          if git ls-files --error-unmatch schema.min.json > /dev/null 2>&1; then
+            # 文件已在仓库中 -> 检查变更
+            if git diff --quiet schema.min.json; then
+              echo "✅ No changes detected, skipping commit."
+              exit 0
+            fi
+          fi
+
+          echo "📝 Detected new or changed schema.min.json, committing..."
           git add schema.min.json
-          git commit -m "chore: update schema.min.json ($(date -u +'%Y-%m-%d %H:%M:%S UTC'))"
+          git commit -m "chore: update schema.min.json ($(date -u +"%Y-%m-%d %H:%M:%S UTC"))"
           git push
