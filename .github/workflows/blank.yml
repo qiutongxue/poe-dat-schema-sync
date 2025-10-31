@@ -17,29 +17,21 @@ jobs:
       - name: Download schema file
         run: |
           echo "Downloading latest schema..."
-          curl -L -o schema.min.json https://github.com/poe-tool-dev/dat-schema/releases/download/latest/schema.min.json
-          ls -lh schema.min.json
-          head -c 100 schema.min.json || true
+          curl -L -o schema.json https://github.com/poe-tool-dev/dat-schema/releases/download/latest/schema.json
+          ls -lh schema.json
+          head -c 100 schema.json || true
 
       - name: Commit and push if changed or new
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ ! -f schema.min.json ]; then
-            echo "❌ schema.min.json not found!"
+          if [ ! -f schema.json ]; then
+            echo "❌ schema.json not found!"
             exit 1
           fi
 
-          if git ls-files --error-unmatch schema.min.json > /dev/null 2>&1; then
-            # 文件已在仓库中 -> 检查变更
-            if git diff --quiet schema.min.json; then
-              echo "✅ No changes detected, skipping commit."
-              exit 0
-            fi
-          fi
-
-          echo "📝 Detected new or changed schema.min.json, committing..."
-          git add schema.min.json
-          git commit -m "chore: update schema.min.json ($(date -u +"%Y-%m-%d %H:%M:%S UTC"))"
+          echo "📝 Detected new or changed schema.json, committing..."
+          git add schema.json
+          git commit -m "chore: update schema.json ($(date -u +"%Y-%m-%d %H:%M:%S UTC"))"
           git push
