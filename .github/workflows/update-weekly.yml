@@ -14,11 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Clean old JSON files
+        run: |
+          rm -f ./*.json ./*.jsonl ./*.min.json || true
+
       - name: Download schema file
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh release download --repo poe-tool-dev/dat-schema --pattern "*.json*"
+          gh release download --repo poe-tool-dev/dat-schema --pattern "*.json*" --clobber
       # - name: Download schema file
       #   run: |
       #     echo "Downloading latest schema..."
