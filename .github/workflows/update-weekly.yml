@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download schema file
-        env: 
+        env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           gh release download --repo poe-tool-dev/dat-schema --pattern "*.json*"
@@ -36,3 +36,10 @@ jobs:
           git add --force ./
           git commit -m "chore: update schema.jsonl ($(date -u +"%Y-%m-%d %H:%M:%S UTC"))"
           git push --force
+
+      - name: Trigger sync-gitee workflow
+        run: |
+          gh api repos/:owner/:repo/dispatches \
+            -f event_type=sync_completed
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}

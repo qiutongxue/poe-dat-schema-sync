@@ -1,10 +1,9 @@
 name: sync to gitee
 on:
-  push:
-    branches:
-      - main
+  repository_dispatch:
+    types: [sync_completed]
   workflow_dispatch:
-  
+
 jobs:
   repo-sync:
     runs-on: ubuntu-latest
@@ -15,8 +14,8 @@ jobs:
       - name: sync github -> gitee
         uses: Yikun/hub-mirror-action@master
         with:
-          src: 'github/qiutongxue'
-          dst: 'gitee/${{ secrets.GITEE_USERNAME }}'
+          src: "github/qiutongxue"
+          dst: "gitee/${{ secrets.GITEE_USERNAME }}"
           dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
-          dst_token:  ${{ secrets.GITEE_TOKEN }}
-          static_list: 'poe-dat-schema-sync'
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          static_list: "poe-dat-schema-sync"
