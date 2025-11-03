@@ -38,7 +38,7 @@ jobs:
           echo "📝 Detected new or changed schema.jsonl, committing..."
           git rm -r --cached .
           git add --force ./
-          git commit -m "chore: update schema.jsonl ($(date -u +"%Y-%m-%d %H:%M:%S UTC"))"
+          git commit -m "chore: update schema.jsonl ($(date -u +"%Y-%m-%d %H:%M:%S UTC"))" || echo "No changes"
           git push --force
 
       - name: Trigger sync-gitee workflow
